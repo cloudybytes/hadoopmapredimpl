@@ -15,7 +15,6 @@ public class InputDriverJoin  extends Configured implements Tool
     @Override
     public int run(String[] args) throws Exception
     {
-        int status = -1;
         Configuration configuration = getConf();
         configuration.set("Separator.File1", ",");
         configuration.set("Separator.File2", ",");
@@ -34,8 +33,7 @@ public class InputDriverJoin  extends Configured implements Tool
         job.setOutputValueClass(Text.class);
         FileOutputFormat.setOutputPath(job, new Path("output"));
         job.waitForCompletion(true);
-        status = job.isSuccessful()? 0:-1;
-        return status;
+        return job.isSuccessful()? 0:-1;
     }
     public static void main(String [] args)
     {
