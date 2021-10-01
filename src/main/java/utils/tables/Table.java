@@ -16,7 +16,7 @@ public class Table {
         }
     }
     public static ArrayList<String> getKeys(String tableName){
-        ArrayList<String> a = new ArrayList<String>();
+        ArrayList<String> a = new ArrayList<>();
         if(tableName.equalsIgnoreCase("rating")){
             a.add("userid");
             a.add("movieid");
