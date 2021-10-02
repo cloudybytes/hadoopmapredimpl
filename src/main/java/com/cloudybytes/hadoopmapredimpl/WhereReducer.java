@@ -5,15 +5,17 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.json.JSONObject;
 import org.apache.hadoop.conf.Configuration;
 
+import java.io.IOException;
+
 public class WhereReducer extends Reducer<Text, Text, Text, Text> {
     private static JSONObject queryJSON;
 
     public void setup(Context context){
         Configuration configuration = context.getConfiguration();
-        queryJSON = new JSONObject(configuration.get("queryJSONString"));
+        // queryJSON = new JSONObject(configuration.get("queryJSONString"));
     }
 
-    public void reduce(Text key, Iterable<Text> values, Context context){
-
+    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+        context.write(key, values.iterator().next());
     }
 }

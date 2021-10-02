@@ -27,13 +27,13 @@
      public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
          String[] values = value.toString().split(commonSeparator);
          StringBuilder stringBuilder = new StringBuilder();
-
-         JSONArray whereJson = queryJSON.getJSONArray("where");
+        //TODO JSon Implement
+        //  JSONArray whereJson = queryJSON.getJSONArray("where");
 
          Table row = new Table(values, Table.getKeys(filename));
-         Pair<String,String> columnValue = row.getColumnValue(whereJson.get(0).toString());
-         String compareOperator = whereJson.get(1).toString();
-         String compareValue = whereJson.get(2).toString();
+         Pair<String,String> columnValue = row.getColumnValue("age");
+         String compareOperator = ">=";
+         String compareValue = "25";
          String type = columnValue.getValue();
 
          if(type.equalsIgnoreCase("Long")){
@@ -99,7 +99,8 @@
              }
          }
 
-         Text groupByColumn = new Text(queryJSON.get("group_by_column").toString());
+
+         Text groupByColumn = new Text(row.getColumnValue("userid").getKey());
          context.write(groupByColumn, value);
      }
  }
