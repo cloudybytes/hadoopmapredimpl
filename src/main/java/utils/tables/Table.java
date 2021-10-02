@@ -18,47 +18,47 @@ public class Table {
     public static ArrayList<Pair<String,String>> getKeys(String tableName){
         ArrayList<Pair<String,String>> a = new ArrayList<>();
         if(tableName.equalsIgnoreCase("rating")){
-            a.add(Pair.of("userid","Integer"));
-            a.add(Pair.of("movieid","Integer"));
-            a.add(Pair.of("rating","Integer"));
+            a.add(Pair.of("userid","Long"));
+            a.add(Pair.of("movieid","Long"));
+            a.add(Pair.of("rating","Long"));
             a.add(Pair.of("timestamp","Long"));
         }
         else if(tableName.equalsIgnoreCase("movies")){
-            a.add(Pair.of("movieid","Integer"));
-            a.add(Pair.of("title","Integer"));
+            a.add(Pair.of("movieid","Long"));
+            a.add(Pair.of("title","Long"));
             a.add(Pair.of("releasedate","Date"));
-            a.add(Pair.of("unknown","Integer"));
-            a.add(Pair.of("action","Integer"));
-            a.add(Pair.of("adventure","Integer"));
-            a.add(Pair.of("animation","Integer"));
-            a.add(Pair.of("children","Integer"));
-            a.add(Pair.of("comedy","Integer"));
-            a.add(Pair.of("crime","Integer"));
-            a.add(Pair.of("documentary","Integer"));
-            a.add(Pair.of("drama","Integer"));
-            a.add(Pair.of("fantasy","Integer"));
-            a.add(Pair.of("film_noir","Integer"));
-            a.add(Pair.of("horror","Integer"));
-            a.add(Pair.of("musical","Integer"));
-            a.add(Pair.of("mystery","Integer"));
-            a.add(Pair.of("romance","Integer"));
-            a.add(Pair.of("sci_fi","Integer"));
-            a.add(Pair.of("thriller","Integer"));
-            a.add(Pair.of("war","Integer"));
-            a.add(Pair.of("western","Integer"));
+            a.add(Pair.of("unknown","Long"));
+            a.add(Pair.of("action","Long"));
+            a.add(Pair.of("adventure","Long"));
+            a.add(Pair.of("animation","Long"));
+            a.add(Pair.of("children","Long"));
+            a.add(Pair.of("comedy","Long"));
+            a.add(Pair.of("crime","Long"));
+            a.add(Pair.of("documentary","Long"));
+            a.add(Pair.of("drama","Long"));
+            a.add(Pair.of("fantasy","Long"));
+            a.add(Pair.of("film_noir","Long"));
+            a.add(Pair.of("horror","Long"));
+            a.add(Pair.of("musical","Long"));
+            a.add(Pair.of("mystery","Long"));
+            a.add(Pair.of("romance","Long"));
+            a.add(Pair.of("sci_fi","Long"));
+            a.add(Pair.of("thriller","Long"));
+            a.add(Pair.of("war","Long"));
+            a.add(Pair.of("western","Long"));
         }
         else if(tableName.equalsIgnoreCase("zipcodes")){
-            a.add(Pair.of("zipcode","Integer"));
+            a.add(Pair.of("zipcode","Long"));
             a.add(Pair.of("zipcodetype","String"));
             a.add(Pair.of("city","String"));
             a.add(Pair.of("state","String"));
         }
         else if(tableName.equalsIgnoreCase("users")){
-            a.add(Pair.of("userid","Integer"));
-            a.add(Pair.of("age","Integer"));
+            a.add(Pair.of("userid","Long"));
+            a.add(Pair.of("age","Long"));
             a.add(Pair.of("gender","String"));
             a.add(Pair.of("occupation","String"));
-            a.add(Pair.of("zipcode","Integer"));
+            a.add(Pair.of("zipcode","Long"));
         }
         return a;
     }
@@ -72,10 +72,10 @@ public class Table {
         }
         return -1;
     }
-    public Object getColumnValue(String columnName) {
+    public Pair<String,String> getColumnValue(String columnName) {
         for (Pair<Pair<String,String>,String> x: row) {
             if(x.getKey().getKey().equalsIgnoreCase(columnName))
-                return x.getValue();
+                return Pair.of(x.getValue(),x.getKey().getValue());
         }
         return null;
     }

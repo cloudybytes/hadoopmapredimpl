@@ -1,5 +1,6 @@
  package com.cloudybytes.hadoopmapredimpl;
 
+ import org.apache.commons.lang3.tuple.Pair;
  import org.apache.hadoop.conf.Configuration;
  import org.apache.hadoop.io.LongWritable;
  import org.apache.hadoop.io.Text;
@@ -27,34 +28,69 @@
          JSONArray whereJson = queryJSON.getJSONArray("where");
 
          Table row = new Table(values, Table.getKeys(filename));
-         Object columnValue = row.getColumnValue((String)whereJson.get(0));
-         String compareOperator = (String) whereJson.get(1);
-         Object compareValue = whereJson.get(2);
+         Pair<String,String> columnValue = row.getColumnValue(whereJson.get(0).toString());
+         String compareOperator = whereJson.get(1).toString();
+         String compareValue = whereJson.get(2).toString();
+         String type = columnValue.getValue();
 
-         if(compareOperator.equalsIgnoreCase("=")){
-            if(columnValue != compareValue)
-                return;
-         }
-         else if(compareOperator.equalsIgnoreCase(">")){
-            //if(columnValue <= compareValue)
-                return;
-         }
-         else if(compareOperator.equalsIgnoreCase("<")){
-             //if(columnValue >= compareValue)
+         if(type.equalsIgnoreCase("Long")){
+             Long tocompare = Long.parseLong(columnValue.getKey());
+             Long comparewith = Long.parseLong(compareValue);
+             if(compareOperator.equalsIgnoreCase("=")){
+                 if(tocompare != comparewith)
+                     return;
+             }
+             else if(compareOperator.equalsIgnoreCase(">")){
+                 if(tocompare <= comparewith)
                  return;
-         }
-         else if(compareOperator.equalsIgnoreCase(">=")){
-             //if(columnValue < compareValue)
+             }
+             else if(compareOperator.equalsIgnoreCase("<")){
+                 if(tocompare >= comparewith)
                  return;
-         }
-         else if(compareOperator.equalsIgnoreCase("<=")){
-             //if(columnValue > compareValue)
+             }
+             else if(compareOperator.equalsIgnoreCase(">=")){
+                 if(tocompare < comparewith)
                  return;
-         }
-         else if(compareOperator.equalsIgnoreCase("<>")){
-             if(columnValue == compareValue)
+             }
+             else if(compareOperator.equalsIgnoreCase("<=")){
+                 if(tocompare > comparewith)
                  return;
+             }
+             else if(compareOperator.equalsIgnoreCase("<>")){
+                 if(tocompare == comparewith)
+                     return;
+             }
          }
+         else if(type.equalsIgnoreCase("Date")){
+             if(compareOperator.equalsIgnoreCase("=")){
+//                 if(columnValue != compareValue)
+                     return;
+             }
+             else if(compareOperator.equalsIgnoreCase(">")){
+                 //if(columnValue <= compareValue)
+                 return;
+             }
+             else if(compareOperator.equalsIgnoreCase("<")){
+                 //if(columnValue >= compareValue)
+                 return;
+             }
+             else if(compareOperator.equalsIgnoreCase(">=")){
+                 //if(columnValue < compareValue)
+                 return;
+             }
+             else if(compareOperator.equalsIgnoreCase("<=")){
+                 //if(columnValue > compareValue)
+                 return;
+             }
+             else if(compareOperator.equalsIgnoreCase("<>")){
+                 if(columnValue == compareValue)
+                     return;
+             }
+         }
+
+
+
+
 
          Text groupByColumn = new Text(queryJSON.get("group_by_column").toString());
          context.write(groupByColumn, value);
