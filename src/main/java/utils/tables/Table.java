@@ -72,7 +72,7 @@ public class Table {
         }
         return -1;
     }
-    Object getColumnValue(String columnName) {
+    public Object getColumnValue(String columnName) {
         for (Pair<Pair<String,String>,String> x: row) {
             if(x.getKey().getKey().equalsIgnoreCase(columnName))
                 return x.getValue();
