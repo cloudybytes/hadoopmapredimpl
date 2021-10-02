@@ -41,20 +41,20 @@ public class InputReducerJoin extends Reducer<Text, Text, Text, Text>
             
             if(firstFileValues != null && secondFileValues != null) {
                 for (int index = 1; index < firstFileValues.length; index++) {
-                    stringBuilder.append(firstFileValues[index] + commonSeparator);
+                    stringBuilder.append(commonSeparator + firstFileValues[index]);
                 }
                 for (int index = 1; index < secondFileValues.length; index++) {
-                    stringBuilder.append(secondFileValues[index] + commonSeparator);
+                    stringBuilder.append(commonSeparator + secondFileValues[index]);
                 }
                 context.write(key, new Text(stringBuilder.toString()));
             }
             else if(firstFileValues != null && typeofjoin.equals("leftouter")){
                 for (int index = 1; index < firstFileValues.length; index++) {
-                    stringBuilder.append(firstFileValues[index] + commonSeparator);
+                    stringBuilder.append(commonSeparator + firstFileValues[index]);
                 }
                 Integer x = Table.getKeys(context.getConfiguration().get("Name.File2")).size();
                 for (int index = 1; index < x;index++){
-                    stringBuilder.append("NULL" + commonSeparator);
+                    stringBuilder.append(commonSeparator + "NULL");
                 }
                 context.write(key, new Text(stringBuilder.toString()));
             }

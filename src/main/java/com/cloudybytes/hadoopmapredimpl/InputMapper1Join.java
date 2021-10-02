@@ -28,7 +28,7 @@ public class InputMapper1Join extends Mapper<LongWritable, Text, Text, Text> {
             String[] values = value.toString().split(separator);
             StringBuilder stringBuilder = new StringBuilder();
             int remidx = 0;
-            remidx = Table.getIdx(filename,"zipcode");
+            remidx = Table.getIdx(filename,"zipcode"); //TODO from json
             for(int index=0;index<values.length;index++)
             {
                 if(index != remidx)

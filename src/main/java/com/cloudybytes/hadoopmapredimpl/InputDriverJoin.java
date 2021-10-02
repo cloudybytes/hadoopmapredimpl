@@ -31,28 +31,33 @@ public class InputDriverJoin  extends Configured implements Tool
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        FileOutputFormat.setOutputPath(job, new Path("output"));
+        FileOutputFormat.setOutputPath(job, new Path("tempOutput"));
         job.waitForCompletion(true);
+
+        if(job.isSuccessful()){
+            configuration.set("","");
+        }
+
         return job.isSuccessful()? 0:-1;
     }
     public static void main(String [] args)
     {
         int result;
-        try{
-            result= ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
-            if(0 == result)
-            {
-                System.out.println("Job completed Successfully...");
+        //if(){//hasJoin
+            try {
+                result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
+                if (0 == result) {
+                    System.out.println("Job completed Successfully...");
+                } else {
+                    System.out.println("Job Failed...");
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
-            else
-            {
-                System.out.println("Job Failed...");
-            }
-        }
-        catch(Exception exception)
-        {
-            exception.printStackTrace();
-        }
+        //}
+        //else{ //no Join
+
+        //}
     }
 }
 
