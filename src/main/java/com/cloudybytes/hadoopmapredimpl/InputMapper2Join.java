@@ -12,7 +12,7 @@ public class InputMapper2Join  extends Mapper <LongWritable, Text, Text, Text>
         private static String commonSeparator;
         private static String FILE_TAG="F2";
         private static String filename;
-
+        private static Integer joinColumn;
         public void setup(Context context)
         {
             Configuration configuration = context.getConfiguration();
@@ -21,6 +21,7 @@ public class InputMapper2Join  extends Mapper <LongWritable, Text, Text, Text>
             filename = configuration.get("Name.File2");
 //Retrieving the file separator from context for writing the data to reducer.
             commonSeparator=configuration.get("Separator.Common");
+            joinColumn = Integer.parseInt(configuration.get("JColumn2"));
         }
         @Override
         public void map(LongWritable rowKey, Text value,
@@ -28,16 +29,14 @@ public class InputMapper2Join  extends Mapper <LongWritable, Text, Text, Text>
         {
             String[] values = value.toString().split(separator);
             StringBuilder stringBuilder = new StringBuilder();
-            int remidx = 0;
-            remidx = Table.getIdx(filename,"zipcode");
             for(int index=0;index<values.length;index++)
             {
-                if(index != remidx)
+                if(index != joinColumn)
                     stringBuilder.append(values[index]+commonSeparator);
             }
-            if(values[remidx] != null && !"NULL".equalsIgnoreCase(values[remidx]))
+            if(values[joinColumn] != null && !"NULL".equalsIgnoreCase(values[joinColumn]))
             {
-                context.write(new Text(values[remidx]), new Text(FILE_TAG+commonSeparator+stringBuilder.toString()));
+                context.write(new Text(values[joinColumn]), new Text(FILE_TAG+commonSeparator+stringBuilder.toString()));
             }
         }
     }
