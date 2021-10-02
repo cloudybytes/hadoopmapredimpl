@@ -6,66 +6,66 @@ import java.util.ArrayList;
 
 
 public class Table {
-    ArrayList<Pair<String,String>> row;
-    public Table(String[] vals,ArrayList<String> keys){
+    ArrayList<Pair<Pair<String,String>,String>> row;
+    public Table(String[] vals,ArrayList<Pair<String,String>> keys){
         row = new ArrayList<>();
         int i = 0;
-        for (String key:keys) {
+        for (Pair<String,String> key:keys) {
             row.add(Pair.of(key,vals[i]));
             i++;
         }
     }
-    public static ArrayList<String> getKeys(String tableName){
-        ArrayList<String> a = new ArrayList<>();
+    public static ArrayList<Pair<String,String>> getKeys(String tableName){
+        ArrayList<Pair<String,String>> a = new ArrayList<>();
         if(tableName.equalsIgnoreCase("rating")){
-            a.add("userid");
-            a.add("movieid");
-            a.add("rating");
-            a.add("timestamp");
+            a.add(Pair.of("userid","Integer"));
+            a.add(Pair.of("movieid","Integer"));
+            a.add(Pair.of("rating","Integer"));
+            a.add(Pair.of("timestamp","Long"));
         }
         else if(tableName.equalsIgnoreCase("movies")){
-            a.add("movieid");
-            a.add("title");
-            a.add("releasedate");
-            a.add("unknown");
-            a.add("action");
-            a.add("adventure");
-            a.add("animation");
-            a.add("children");
-            a.add("comedy");
-            a.add("crime");
-            a.add("documentary");
-            a.add("drama");
-            a.add("fantasy");
-            a.add("film_noir");
-            a.add("horror");
-            a.add("musical");
-            a.add("mystery");
-            a.add("romance");
-            a.add("sci_fi");
-            a.add("thriller");
-            a.add("war");
-            a.add("western");
+            a.add(Pair.of("movieid","Integer"));
+            a.add(Pair.of("title","Integer"));
+            a.add(Pair.of("releasedate","Date"));
+            a.add(Pair.of("unknown","Integer"));
+            a.add(Pair.of("action","Integer"));
+            a.add(Pair.of("adventure","Integer"));
+            a.add(Pair.of("animation","Integer"));
+            a.add(Pair.of("children","Integer"));
+            a.add(Pair.of("comedy","Integer"));
+            a.add(Pair.of("crime","Integer"));
+            a.add(Pair.of("documentary","Integer"));
+            a.add(Pair.of("drama","Integer"));
+            a.add(Pair.of("fantasy","Integer"));
+            a.add(Pair.of("film_noir","Integer"));
+            a.add(Pair.of("horror","Integer"));
+            a.add(Pair.of("musical","Integer"));
+            a.add(Pair.of("mystery","Integer"));
+            a.add(Pair.of("romance","Integer"));
+            a.add(Pair.of("sci_fi","Integer"));
+            a.add(Pair.of("thriller","Integer"));
+            a.add(Pair.of("war","Integer"));
+            a.add(Pair.of("western","Integer"));
         }
         else if(tableName.equalsIgnoreCase("zipcodes")){
-            a.add("zipcode");
-            a.add("zipcodetype");
-            a.add("city");
-            a.add("state");
+            a.add(Pair.of("zipcode","Integer"));
+            a.add(Pair.of("zipcodetype","String"));
+            a.add(Pair.of("city","String"));
+            a.add(Pair.of("state","String"));
         }
         else if(tableName.equalsIgnoreCase("users")){
-            a.add("userid");
-            a.add("age");
-            a.add("gender");
-            a.add("occupation");
-            a.add("zipcode");
+            a.add(Pair.of("userid","Integer"));
+            a.add(Pair.of("age","Integer"));
+            a.add(Pair.of("gender","String"));
+            a.add(Pair.of("occupation","String"));
+            a.add(Pair.of("zipcode","Integer"));
         }
         return a;
     }
     public static int getIdx(String filename,String columnname){
         int i = 0;
-        for(String x : Table.getKeys(filename)){
-            if(x.equalsIgnoreCase(columnname)){
+        for(Pair<String,String> x : Table.getKeys(filename)){
+            if(x.getKey().equalsIgnoreCase(columnname)){
                 return i;
             }
             i++;
@@ -73,8 +73,8 @@ public class Table {
         return -1;
     }
     Object getColumnValue(String columnName) {
-        for (Pair<String,String> x: row) {
-            if(x.getKey().equalsIgnoreCase(columnName))
+        for (Pair<Pair<String,String>,String> x: row) {
+            if(x.getKey().getKey().equalsIgnoreCase(columnName))
                 return x.getValue();
         }
         return null;
@@ -85,8 +85,9 @@ public class Table {
     }
 
     Boolean checkColumnValue(String columnName, String value) {
-        for (Pair<String,String> x: row) {
-            if(x.getKey().equalsIgnoreCase(columnName) && x.getValue().equalsIgnoreCase(value))
+        for (Pair<Pair<String,String>,String> x: row) {
+            //TODO Add all Data Type Check Values
+            if(x.getKey().getKey().equalsIgnoreCase(columnName) && x.getValue().equalsIgnoreCase(value))
                 return true;
         }
         return false;
