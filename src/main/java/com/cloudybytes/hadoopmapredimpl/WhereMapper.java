@@ -10,6 +10,9 @@
  import utils.tables.Table;
 
  import java.io.IOException;
+ import java.text.ParseException;
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
 
  public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
      private static String commonSeparator;
@@ -62,35 +65,39 @@
              }
          }
          else if(type.equalsIgnoreCase("Date")){
-             if(compareOperator.equalsIgnoreCase("=")){
-//                 if(columnValue != compareValue)
-                     return;
+             try {
+                 Date tocompare = new SimpleDateFormat("dd-MMM-yy").parse(columnValue.getKey());
+                 Date comparewith = new SimpleDateFormat("dd-MMM-yy").parse(compareValue);
+
+                 if(compareOperator.equalsIgnoreCase("=")){
+                     if(tocompare != comparewith)
+                         return;
+                 }
+                 else if(compareOperator.equalsIgnoreCase(">")){
+                     if(!tocompare.after(comparewith))
+                         return;
+                 }
+                 else if(compareOperator.equalsIgnoreCase("<")){
+                     if(!tocompare.before(comparewith))
+                         return;
+                 }
+                 else if(compareOperator.equalsIgnoreCase(">=")){
+                     if(tocompare.before(comparewith))
+                         return;
+                 }
+                 else if(compareOperator.equalsIgnoreCase("<=")){
+                     if(tocompare.after(comparewith))
+                         return;
+                 }
+                 else if(compareOperator.equalsIgnoreCase("<>")){
+                     if(tocompare.equals(comparewith))
+                         return;
+                 }
              }
-             else if(compareOperator.equalsIgnoreCase(">")){
-                 //if(columnValue <= compareValue)
-                 return;
-             }
-             else if(compareOperator.equalsIgnoreCase("<")){
-                 //if(columnValue >= compareValue)
-                 return;
-             }
-             else if(compareOperator.equalsIgnoreCase(">=")){
-                 //if(columnValue < compareValue)
-                 return;
-             }
-             else if(compareOperator.equalsIgnoreCase("<=")){
-                 //if(columnValue > compareValue)
-                 return;
-             }
-             else if(compareOperator.equalsIgnoreCase("<>")){
-                 if(columnValue == compareValue)
-                     return;
+             catch (ParseException e) {
+                 e.printStackTrace();
              }
          }
-
-
-
-
 
          Text groupByColumn = new Text(queryJSON.get("group_by_column").toString());
          context.write(groupByColumn, value);
