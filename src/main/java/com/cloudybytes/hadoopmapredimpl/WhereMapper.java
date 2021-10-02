@@ -12,6 +12,7 @@
  import java.io.IOException;
  import java.text.ParseException;
  import java.text.SimpleDateFormat;
+ import java.util.ArrayList;
  import java.util.Date;
 
  public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
@@ -29,8 +30,21 @@
          StringBuilder stringBuilder = new StringBuilder();
         //TODO JSon Implement
         //  JSONArray whereJson = queryJSON.getJSONArray("where");
+         Table row;
+         Boolean hasJoin = true;
+         if(!hasJoin)
+            row = new Table(values, Table.getKeys(filename));
+         else{
+             values[0] = values[0].trim();
+             ArrayList<Pair<String,String>> keys = new ArrayList<>();
+             String[] a = context.getConfiguration().getStrings("cnames");
+             String[] b = context.getConfiguration().getStrings("ctypes");
+             for(int i = 0;i<a.length;i++){
+                 keys.add(Pair.of(a[i],b[i]));
+             }
+             row = new Table(values,keys);
+         }
 
-         Table row = new Table(values, Table.getKeys(filename));
          Pair<String,String> columnValue = row.getColumnValue("age");
          String compareOperator = ">=";
          String compareValue = "25";

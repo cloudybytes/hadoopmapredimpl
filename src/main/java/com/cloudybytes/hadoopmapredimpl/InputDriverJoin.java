@@ -6,16 +6,18 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import utils.tables.Table;
 
 import java.util.ArrayList;
 
-public class InputDriverJoin  extends Configured implements Tool
+public class InputDriverJoin extends Configured implements Tool
 {
     @Override
     public int run(String[] args) throws Exception
@@ -27,7 +29,7 @@ public class InputDriverJoin  extends Configured implements Tool
         configuration.set("Name.File1", "rating");
         configuration.set("Name.File2", "users");
         configuration.set("Jointype","leftouter");
-        configuration.set("Separator.Common", ";");
+        configuration.set("Separator.Common", ",");
         Integer remidx1 = Table.getIdx(configuration.get("Name.File1"),"userid");
         Integer remidx2 = Table.getIdx(configuration.get("Name.File2"),"userid");
         Integer size1 = Table.getKeys(configuration.get("Name.File1")).size();
@@ -45,8 +47,13 @@ public class InputDriverJoin  extends Configured implements Tool
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        FileOutputFormat.setOutputPath(job, new Path("tempOutput"));
+//        job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ";");
+//        job.getConfiguration().set("mapreduce.output.textoutputformat.base_output_name", "result");
+        TextOutputFormat.setOutputPath(job,new Path("Join"));
+        
+//        FileOutputFormat.setOutputPath(job, new Path("tempOutput"));
         job.waitForCompletion(true);
+
         return job.isSuccessful()? 0:-1;
     }
     public static void main(String [] args)
@@ -54,7 +61,6 @@ public class InputDriverJoin  extends Configured implements Tool
         int result;
         //if(){//hasJoin
             try {
-                
                 result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
                 if (0 == result) {
                     System.out.println("Join completed Successfully...");
@@ -85,17 +91,13 @@ public class InputDriverJoin  extends Configured implements Tool
                     }
                     conf.setStrings("cnames",cnames.toArray(new String[0]));
                     conf.setStrings("ctypes",ctypes.toArray(new String[0]));
-                    result = ToolRunner.run(conf,new WhereDriver(),args);
+                   result = ToolRunner.run(conf,new WhereDriver(),args);
                 } else {
                     System.out.println("Job Failed...");
                 }
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-        //}
-        //else{ //no Join
-
-        //}
     }
 }
 

@@ -12,17 +12,23 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class WhereDriver  extends Configured implements Tool
 {
     @Override
     public int run(String[] args) throws Exception
     {
         Configuration configuration = getConf();
+//        String[] cnames = configuration.getStrings("cnames");
+//        String[] ctypes = configuration.getStrings("ctypes");
         configuration.set("Separator.File", ",");
         configuration.set("Name.File", "users");
         configuration.set("Separator.Common", ",");
         Job job = new Job(configuration, "Where Example");
-        FileInputFormat.addInputPath(job,new Path("users.csv"));
+        FileInputFormat.addInputPath(job,new Path("Join/part-r-00000"));
         job.setJarByClass(WhereDriver.class);
         job.setReducerClass(WhereReducer.class);
         job.setMapperClass(WhereMapper.class);
@@ -30,6 +36,7 @@ public class WhereDriver  extends Configured implements Tool
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
+        job.setNumReduceTasks(0);
         FileOutputFormat.setOutputPath(job, new Path("whereOutput"));
         job.waitForCompletion(true);
 

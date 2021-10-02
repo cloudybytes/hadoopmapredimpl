@@ -11,6 +11,7 @@ public class Table {
         row = new ArrayList<>();
         int i = 0;
         for (Pair<String,String> key:keys) {
+            if(i < vals.length)
             row.add(Pair.of(key,vals[i]));
             i++;
         }
