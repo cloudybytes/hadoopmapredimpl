@@ -3,18 +3,12 @@ package com.cloudybytes.hadoopmapredimpl;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WhereDriver  extends Configured implements Tool
 {
@@ -22,8 +16,8 @@ public class WhereDriver  extends Configured implements Tool
     public int run(String[] args) throws Exception
     {
         Configuration configuration = getConf();
-//        String[] cnames = configuration.getStrings("cnames");
-//        String[] ctypes = configuration.getStrings("ctypes");
+//        String[] cNames = configuration.getStrings("cNames");
+//        String[] cTypes = configuration.getStrings("cTypes");
         configuration.set("Separator.File", ",");
         configuration.set("Name.File", "users");
         configuration.set("Separator.Common", ",");

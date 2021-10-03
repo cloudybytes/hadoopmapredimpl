@@ -80,25 +80,85 @@ public class Table {
         }
         return null;
     }
-
-    String groupByString(String[] columns) {
-        return null;
-    }
-
-    Boolean checkColumnValue(String columnName, String value) {
+    String getColumnType(String columnName){
         for (Pair<Pair<String,String>,String> x: row) {
-            //TODO Add all Data Type Check Values
-            if(x.getKey().getKey().equalsIgnoreCase(columnName) && x.getValue().equalsIgnoreCase(value))
-                return true;
+            if(x.getKey().getKey().equalsIgnoreCase(columnName))
+                return x.getKey().getValue();
         }
+        return null;
+    }
+    public long getAggregate(String operation, String column, ArrayList<Table> arr) {
+        String columnType = getColumnType(column);
+
+        if(!columnType.equalsIgnoreCase("Long"))
+            return -1;
+
+        long aggregate = 0;
+
+        if(operation.equalsIgnoreCase("count")){
+            aggregate = 0;
+            for(Table row : arr){
+                aggregate++;
+            }
+        }
+        else if(operation.equalsIgnoreCase("max")){
+            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getLeft());
+
+            for(Table row : arr){
+                aggregate = Long.max(aggregate, Long.parseLong(row.getColumnValue(column).getLeft()));
+            }
+        }
+        else if(operation.equalsIgnoreCase("min")){
+            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getLeft());
+
+            for(Table row : arr){
+                aggregate = Long.min(aggregate, Long.parseLong(row.getColumnValue(column).getLeft()));
+            }
+        }
+        else if(operation.equalsIgnoreCase("avg")){
+            aggregate = 0;
+
+            for(Table row : arr){
+                aggregate += Long.parseLong(row.getColumnValue(column).getLeft());
+            }
+
+            aggregate = aggregate / arr.size();
+        }
+        else if(operation.equalsIgnoreCase("sum")){
+            aggregate = 0;
+
+            for(Table row : arr){
+                aggregate += Long.parseLong(row.getColumnValue(column).getLeft());
+            }
+        }
+
+        return aggregate;
+    }
+    public Boolean compareAggregate(String column, String operation, String comparisonOperator, String value, ArrayList<Table> arr) {
+        String columnType = getColumnType(column);
+
+        if(!columnType.equalsIgnoreCase("Long"))
+            return false;
+
+        if(comparisonOperator.equalsIgnoreCase("<")){
+            return getAggregate(operation, column, arr) < Long.parseLong(value);
+        }
+        else if(comparisonOperator.equalsIgnoreCase(">")){
+            return getAggregate(operation, column, arr) > Long.parseLong(value);
+        }
+        else if(comparisonOperator.equalsIgnoreCase("<=")){
+            return getAggregate(operation, column, arr) <= Long.parseLong(value);
+        }
+        if(comparisonOperator.equalsIgnoreCase(">=")){
+            return getAggregate(operation, column, arr) >= Long.parseLong(value);
+        }
+        if(comparisonOperator.equalsIgnoreCase("!=")){
+            return getAggregate(operation, column, arr) != Long.parseLong(value);
+        }
+        if(comparisonOperator.equalsIgnoreCase("==")){
+            return getAggregate(operation, column, arr) == Long.parseLong(value);
+        }
+
         return false;
-    }
-
-    Object getAggregate(String operation, String column, ArrayList<Table> arr) {
-        return null;
-    }
-
-    Boolean compareAggregate(String column, String operation, String comparisonOperator, String value, ArrayList<Table> arr) {
-        return null;
     }
 }

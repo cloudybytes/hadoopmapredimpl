@@ -4,7 +4,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import utils.tables.Table;
 
 public class InputMapper2Join  extends Mapper <LongWritable, Text, Text, Text>
     {

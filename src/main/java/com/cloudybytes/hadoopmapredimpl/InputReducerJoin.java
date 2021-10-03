@@ -6,7 +6,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import utils.tables.Table;
 public class InputReducerJoin extends Reducer<Text, Text, Text, Text>
     {
         private static String commonSeparator;

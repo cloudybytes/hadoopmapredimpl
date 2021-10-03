@@ -3,13 +3,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
@@ -50,8 +47,6 @@ public class InputDriverJoin extends Configured implements Tool
 //        job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ";");
 //        job.getConfiguration().set("mapreduce.output.textoutputformat.base_output_name", "result");
         TextOutputFormat.setOutputPath(job,new Path("Join"));
-        
-//        FileOutputFormat.setOutputPath(job, new Path("tempOutput"));
         job.waitForCompletion(true);
 
         return job.isSuccessful()? 0:-1;
@@ -67,31 +62,35 @@ public class InputDriverJoin extends Configured implements Tool
                     Configuration conf = new Configuration();
                     ArrayList<Pair<String,String>> a = Table.getKeys("rating");
                     ArrayList<Pair<String,String>> b = Table.getKeys("users");
-                    ArrayList<String> cnames = new ArrayList<>();
-                    ArrayList<String> ctypes = new ArrayList<>();
+                    ArrayList<String> cNames = new ArrayList<>();
+                    ArrayList<String> cTypes = new ArrayList<>();
                     int idx1 = Table.getIdx("rating","userid");
                     int idx2 = Table.getIdx("users","userid");
-                    cnames.add(a.get(idx1).getKey());
-                    ctypes.add(a.get(idx1).getKey());
+                    cNames.add(a.get(idx1).getKey());
+                    cTypes.add(a.get(idx1).getKey());
                     Integer i = 0;
                     for(Pair<String,String> x : a){
                         if(i != idx1){
-                            cnames.add(x.getKey());
-                            ctypes.add(x.getValue());
+                            cNames.add(x.getKey());
+                            cTypes.add(x.getValue());
                         }
                         i++;
                     }
                     i = 0;
                     for(Pair<String,String> x : b){
                         if(i != idx2){
-                            cnames.add(x.getKey());
-                            ctypes.add(x.getValue());
+                            cNames.add(x.getKey());
+                            cTypes.add(x.getValue());
                         }
                         i++;
                     }
-                    conf.setStrings("cnames",cnames.toArray(new String[0]));
-                    conf.setStrings("ctypes",ctypes.toArray(new String[0]));
-                   result = ToolRunner.run(conf,new WhereDriver(),args);
+                    conf.setStrings("cNames",cNames.toArray(new String[0]));
+                    conf.setStrings("cTypes",cTypes.toArray(new String[0]));
+                    result = ToolRunner.run(conf,new WhereDriver(),args);
+
+
+                    if(0 != result)
+                        System.out.println("Job Failed...");
                 } else {
                     System.out.println("Job Failed...");
                 }

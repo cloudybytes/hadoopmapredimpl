@@ -5,7 +5,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import utils.tables.Table;
 public class InputMapper1Join extends Mapper<LongWritable, Text, Text, Text> {
 
         private static String separator;
