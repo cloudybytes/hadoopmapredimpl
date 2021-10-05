@@ -16,13 +16,19 @@ public class WhereDriver  extends Configured implements Tool
     public int run(String[] args) throws Exception
     {
         Configuration configuration = getConf();
-//        String[] cNames = configuration.getStrings("cNames");
-//        String[] cTypes = configuration.getStrings("cTypes");
         configuration.set("Separator.File", ",");
+        // TODO Add JSON Part
         configuration.set("Name.File", "users");
         configuration.set("Separator.Common", ",");
         Job job = new Job(configuration, "Where Example");
-        FileInputFormat.addInputPath(job,new Path("Join/part-r-00000"));
+        // TODO Add JSON Part
+        Boolean hasJoin = false;
+        if(hasJoin)
+            FileInputFormat.addInputPath(job,new Path("Join/part-r-00000"));
+        else{
+//           TODO add table from JSON
+            FileInputFormat.addInputPath(job,new Path(""));
+        }
         job.setJarByClass(WhereDriver.class);
         job.setReducerClass(WhereReducer.class);
         job.setMapperClass(WhereMapper.class);
@@ -30,20 +36,17 @@ public class WhereDriver  extends Configured implements Tool
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        job.setNumReduceTasks(0);
+        // TODO Add JSON Part
+        Boolean hasGroupBy = false;
+        if(!hasGroupBy)
+            job.setNumReduceTasks(0);
         FileOutputFormat.setOutputPath(job, new Path("whereOutput"));
         job.waitForCompletion(true);
-
-        if(job.isSuccessful()){
-            configuration.set("","");
-        }
-
         return job.isSuccessful()? 0:-1;
     }
     public static void main(String [] args)
     {
         int result;
-        //if(){//hasJoin
         try {
             result = ToolRunner.run(new Configuration(), new WhereDriver(), args);
             if (0 == result) {
@@ -54,10 +57,6 @@ public class WhereDriver  extends Configured implements Tool
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        //}
-        //else{ //no Join
-
-        //}
     }
 }
 

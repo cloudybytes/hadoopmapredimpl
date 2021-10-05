@@ -102,24 +102,24 @@ public class Table {
             }
         }
         else if(operation.equalsIgnoreCase("max")){
-            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getLeft());
+            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getKey());
 
             for(Table row : arr){
-                aggregate = Long.max(aggregate, Long.parseLong(row.getColumnValue(column).getLeft()));
+                aggregate = Long.max(aggregate, Long.parseLong(row.getColumnValue(column).getKey()));
             }
         }
         else if(operation.equalsIgnoreCase("min")){
-            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getLeft());
+            aggregate = Long.parseLong(arr.get(0).getColumnValue(column).getKey());
 
             for(Table row : arr){
-                aggregate = Long.min(aggregate, Long.parseLong(row.getColumnValue(column).getLeft()));
+                aggregate = Long.min(aggregate, Long.parseLong(row.getColumnValue(column).getKey()));
             }
         }
         else if(operation.equalsIgnoreCase("avg")){
             aggregate = 0;
 
             for(Table row : arr){
-                aggregate += Long.parseLong(row.getColumnValue(column).getLeft());
+                aggregate += Long.parseLong(row.getColumnValue(column).getKey());
             }
 
             aggregate = aggregate / arr.size();
@@ -128,7 +128,7 @@ public class Table {
             aggregate = 0;
 
             for(Table row : arr){
-                aggregate += Long.parseLong(row.getColumnValue(column).getLeft());
+                aggregate += Long.parseLong(row.getColumnValue(column).getKey());
             }
         }
 

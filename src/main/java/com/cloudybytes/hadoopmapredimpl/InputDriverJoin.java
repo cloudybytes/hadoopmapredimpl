@@ -23,10 +23,12 @@ public class InputDriverJoin extends Configured implements Tool
         
         configuration.set("Separator.File1", ",");
         configuration.set("Separator.File2", ",");
+        // TODO Add JSON Part
         configuration.set("Name.File1", "rating");
         configuration.set("Name.File2", "users");
         configuration.set("Jointype","leftouter");
         configuration.set("Separator.Common", ",");
+
         Integer remidx1 = Table.getIdx(configuration.get("Name.File1"),"userid");
         Integer remidx2 = Table.getIdx(configuration.get("Name.File2"),"userid");
         Integer size1 = Table.getKeys(configuration.get("Name.File1")).size();
@@ -36,6 +38,7 @@ public class InputDriverJoin extends Configured implements Tool
         configuration.set("JColumn1",remidx1.toString());
         configuration.set("JColumn2",remidx2.toString());
         Job job = new Job(configuration, "Multiple Input Example");
+        // TODO Add JSON Part
         MultipleInputs.addInputPath(job,new Path("rating.csv"), TextInputFormat.class, InputMapper1Join.class);
         MultipleInputs.addInputPath(job, new Path("users.csv"), TextInputFormat.class, InputMapper2Join.class);
         job.setJarByClass(InputDriverJoin.class);
@@ -44,59 +47,57 @@ public class InputDriverJoin extends Configured implements Tool
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-//        job.getConfiguration().set("mapreduce.output.textoutputformat.separator", ";");
-//        job.getConfiguration().set("mapreduce.output.textoutputformat.base_output_name", "result");
         TextOutputFormat.setOutputPath(job,new Path("Join"));
         job.waitForCompletion(true);
 
         return job.isSuccessful()? 0:-1;
     }
-    public static void main(String [] args)
-    {
+    public static void main(String [] args) throws Exception {
         int result;
-        //if(){//hasJoin
-            try {
-                result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
-                if (0 == result) {
-                    System.out.println("Join completed Successfully...");
-                    Configuration conf = new Configuration();
-                    ArrayList<Pair<String,String>> a = Table.getKeys("rating");
-                    ArrayList<Pair<String,String>> b = Table.getKeys("users");
-                    ArrayList<String> cNames = new ArrayList<>();
-                    ArrayList<String> cTypes = new ArrayList<>();
-                    int idx1 = Table.getIdx("rating","userid");
-                    int idx2 = Table.getIdx("users","userid");
-                    cNames.add(a.get(idx1).getKey());
-                    cTypes.add(a.get(idx1).getKey());
-                    Integer i = 0;
-                    for(Pair<String,String> x : a){
-                        if(i != idx1){
-                            cNames.add(x.getKey());
-                            cTypes.add(x.getValue());
-                        }
-                        i++;
+        // TODO Add JSON Part
+        Boolean hasJoin = true;
+        Boolean hasGroupBy = true;
+        if(hasJoin) {
+            result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
+            if (0 == result) {
+                System.out.println("Join completed Successfully...");
+                Configuration conf = new Configuration();
+                // TODO Add JSON Part
+                ArrayList<Pair<String, String>> a = Table.getKeys("rating");
+                ArrayList<Pair<String, String>> b = Table.getKeys("users");
+                ArrayList<String> cNames = new ArrayList<>();
+                ArrayList<String> cTypes = new ArrayList<>();
+                // TODO Add JSON Part
+                int idx1 = Table.getIdx("rating", "userid");
+                int idx2 = Table.getIdx("users", "userid");
+                cNames.add(a.get(idx1).getKey());
+                cTypes.add(a.get(idx1).getKey());
+                Integer i = 0;
+                for (Pair<String, String> x : a) {
+                    if (i != idx1) {
+                        cNames.add(x.getKey());
+                        cTypes.add(x.getValue());
                     }
-                    i = 0;
-                    for(Pair<String,String> x : b){
-                        if(i != idx2){
-                            cNames.add(x.getKey());
-                            cTypes.add(x.getValue());
-                        }
-                        i++;
-                    }
-                    conf.setStrings("cNames",cNames.toArray(new String[0]));
-                    conf.setStrings("cTypes",cTypes.toArray(new String[0]));
-                    result = ToolRunner.run(conf,new WhereDriver(),args);
-
-
-                    if(0 != result)
-                        System.out.println("Job Failed...");
-                } else {
-                    System.out.println("Job Failed...");
+                    i++;
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
+                i = 0;
+                for (Pair<String, String> x : b) {
+                    if (i != idx2) {
+                        cNames.add(x.getKey());
+                        cTypes.add(x.getValue());
+                    }
+                    i++;
+                }
+                conf.setStrings("cNames", cNames.toArray(new String[0]));
+                conf.setStrings("cTypes", cTypes.toArray(new String[0]));
+                result = ToolRunner.run(conf, new WhereDriver(), args);
+                if (0 != result)
+                    System.out.println("Job Failed...");
+                else {
+                    System.out.println("Job Completed Successfully");
+                }
             }
+        }
     }
 }
 

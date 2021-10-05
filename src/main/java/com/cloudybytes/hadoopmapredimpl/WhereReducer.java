@@ -18,14 +18,14 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 
 	public void setup(Context context){
 		configuration = context.getConfiguration();
-		queryJSON = new JSONObject(configuration.get("queryJSONString"));
+		// queryJSON = new JSONObject(configuration.get("queryJSONString"));
 	}
 
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		ArrayList<Table> arr = new ArrayList<Table>();
 		String[] cNames = configuration.getStrings("cNames");
         String[] cTypes = configuration.getStrings("cTypes");
-		ArrayList<Pair<String, String>> keys = new ArrayList<Pair<String, String>>();
+		ArrayList<Pair<String, String>> keys = new ArrayList<>();
 		int i;
 
 		for(i = 0; i < cNames.length; i++){
@@ -40,20 +40,24 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 		}
 		if (arr.size() == 0)
 			return;
+		// TODO Integrate with JSON
+//		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
+//		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
+//		JSONArray columnsArray = queryJSON.getJSONArray("columns");
+		ArrayList<String> columnsArray = new ArrayList<>();
+		// TODO add GroupBy Column
+		columnsArray.add("age");
 
-		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
-		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
-		JSONArray columnsArray = queryJSON.getJSONArray("columns");
 		StringBuilder outputRow = new StringBuilder();
 
-		String aggr = String.valueOf(arr.get(0).getAggregate(aggregateFunction, havingJSON.get(0).toString(), arr));
-		if (!arr.get(0).compareAggregate(havingJSON.get(0).toString(), aggregateFunction, havingJSON.get(1).toString(), havingJSON.get(2).toString(), arr)) {
+		String aggr = String.valueOf(arr.get(0).getAggregate("count"/*aggregateFunction*/, "age"/*havingJSON.get(0).toString()*/, arr));
+		if (!arr.get(0).compareAggregate("age"/*havingJSON.get(0).toString()*/, "count"/*aggregateFunction*/, ">"/*havingJSON.get(1).toString()*/, "10"/*havingJSON.get(2).toString()*/, arr)) {
 			return;
 		}
-		for (i = 0; i < columnsArray.length(); i++) {
-			outputRow.append(arr.get(0).getColumnValue(columnsArray.getString(i)).toString()).append(",");
+		for (i = 0; i < columnsArray.size(); i++) {
+			outputRow.append(",").append(arr.get(0).getColumnValue(columnsArray.get(i)).getKey());
 		}
-		outputRow.append(aggr);
+		outputRow.append(",").append(aggr);
 		context.write(key, new Text(outputRow.toString()));
 	}
 }
