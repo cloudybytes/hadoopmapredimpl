@@ -90,7 +90,8 @@ public class ServiceController {
 			}
 			int i=0;
 			Scanner subFile = new Scanner(new File(filename));
-			BufferedWriter writer = new BufferedWriter(new FileWriter("main/resources/static/output.csv", false));
+			File myFile = new File("./src/main/resources/static/output.csv");
+			BufferedWriter writer = new BufferedWriter(new FileWriter(myFile, false));
 			while(subFile.hasNext())
 			{
 				String line = subFile.nextLine();
