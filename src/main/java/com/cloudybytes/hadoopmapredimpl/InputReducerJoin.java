@@ -24,7 +24,7 @@ public class InputReducerJoin extends Reducer<Text, Text, Text, Text>
         {
             StringBuilder stringBuilder = new StringBuilder();
             ArrayList<String[]> firstFileValues= new ArrayList<>();
-            String[] secondFileValues=null;
+            ArrayList<String[]> secondFileValues = new ArrayList<>();
             String[] stringValues;
             for (Text textValue : textValues)
             {
@@ -35,29 +35,32 @@ public class InputReducerJoin extends Reducer<Text, Text, Text, Text>
                 }
                 if("F2".equalsIgnoreCase(stringValues[0]))
                 {
-                    secondFileValues = Arrays.copyOf(stringValues, stringValues.length);
+                    secondFileValues.add(Arrays.copyOf(stringValues, stringValues.length));
                 }
             }
-            Integer x = Integer.parseInt(context.getConfiguration().get("Size.File2"));
-            if(firstFileValues.size() != 0 && secondFileValues != null) {
+            int x = Integer.parseInt(context.getConfiguration().get("Size.File2"));
+            if(firstFileValues.size() != 0 && secondFileValues.size() != 0) {
                 for(String[] file : firstFileValues) {
                     for (int index = 1; index < file.length; index++) {
-                        stringBuilder.append(commonSeparator + file[index]);
+                        stringBuilder.append(commonSeparator).append(file[index]);
                     }
-                    for (int index = 1; index < secondFileValues.length; index++) {
-                        stringBuilder.append(commonSeparator + secondFileValues[index]);
+                    for (String[] file2 : secondFileValues)
+                    {
+                        for (int index = 1; index < file2.length; index++) {
+                            stringBuilder.append(commonSeparator).append(file2[index]);
+                        }
+                        context.write(key, new Text(stringBuilder.toString()));
+                        stringBuilder.delete(0, stringBuilder.length());
                     }
-                    context.write(key, new Text(stringBuilder.toString()));
-                    stringBuilder.delete(0,stringBuilder.length());
                 }
             }
             else if(firstFileValues.size() != 0 && typeofjoin.equals("leftouter")){
                 for(String[] file : firstFileValues) {
                     for (int index = 1; index < file.length; index++) {
-                        stringBuilder.append(commonSeparator + file[index]);
+                        stringBuilder.append(commonSeparator).append(file[index]);
                     }
                     for (int index = 1; index < x; index++) {
-                        stringBuilder.append(commonSeparator + "NULL");
+                        stringBuilder.append(commonSeparator).append("NULL");
                     }
                     context.write(key, new Text(stringBuilder.toString()));
                     stringBuilder.delete(0,stringBuilder.length());

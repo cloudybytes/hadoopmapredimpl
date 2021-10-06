@@ -8,6 +8,7 @@ import java.util.Date;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.json.JSONArray;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,11 @@ import utils.tables.Table;
 
 @RestController
 public class ServiceController {
+	@GetMapping(value = "/hello")
+	public String hello(){
+		return "Hello";
+	}
+
 	@PostMapping(value = "/execute", consumes = "application/json")
 	public Map<String, Object> execute(@RequestBody String queryString) throws Exception {
 		String[] columns;
@@ -83,7 +89,7 @@ public class ServiceController {
 		long end = new Date().getTime();
 
 		Map<String, Object> response = new HashMap<String, Object>();
-		response.put("Time", (end - start) + " milliseconds");
+		response.put("time", (end - start) + " milliseconds");
 		return response;
 	}
 }
