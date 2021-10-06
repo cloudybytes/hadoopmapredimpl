@@ -32,7 +32,6 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
         String[] values = value.toString().split(commonSeparator);
         StringBuilder stringBuilder = new StringBuilder();
         // TODO JSon Implement
-        JSONArray whereJson = queryJSON.getJSONArray("where");
         Table row;
         // TODO Json Implement
         boolean hasJoin = !queryJSON.isNull("join");

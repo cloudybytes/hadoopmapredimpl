@@ -1,9 +1,9 @@
 package com.cloudybytes.hadoopmapredimpl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Date;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
@@ -69,27 +69,41 @@ public class ServiceController {
 				conf.setStrings("cNames", cNames.toArray(new String[0]));
 				conf.setStrings("cTypes", cTypes.toArray(new String[0]));
 				result = ToolRunner.run(conf, new WhereDriver(), args);
-				if (0 != result)
-					System.out.println("Job Failed...");
-				else {
-					System.out.println("Job Completed Successfully");
-				}
+
 			}
 		}
 		else {
 			Configuration conf = new Configuration();
 			result = ToolRunner.run(conf, new WhereDriver(), args);
-			if (0 != result)
-				System.out.println("Job Failed...");
-			else {
-				System.out.println("Job Completed Successfully");
-			}
 		}
-
+		if (0 != result)
+			System.out.println("Job Failed...");
+		else {
+			System.out.println("Job Completed Successfully");
+			String filename;
+			if(queryJSON.isNull("group_by_column")){
+				filename = "whereOutput/part-m-00000";
+			}
+			else{
+				filename = "whereOutput/part-r-00000";
+			}
+			int i=0;
+			Scanner subFile = new Scanner(new File(filename));
+			BufferedWriter writer = new BufferedWriter(new FileWriter("main/resources/static/output.csv", false));
+			while(subFile.hasNext())
+			{
+				String line = subFile.nextLine();
+				line.trim().replaceAll(" +", ""); //check for double spaces
+				writer.append(line);
+				writer.append('\n');
+			}
+			writer.close();
+		}
 		long end = new Date().getTime();
 
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		response.put("time", (end - start) + " milliseconds");
+		response.put("output_url","/output.csv");
 		return response;
 	}
 }
