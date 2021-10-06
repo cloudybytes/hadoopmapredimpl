@@ -42,6 +42,7 @@ public class InputDriverJoin extends Configured implements Tool
         configuration.set("Size.File2",size2.toString());
         configuration.set("JColumn1",remidx1.toString());
         configuration.set("JColumn2",remidx2.toString());
+        configuration.set("queryJSONString", args[0]);
         Job job = new Job(configuration, "Multiple Input Example");
         // TODO Add JSON Part
         // TODO done
@@ -63,7 +64,7 @@ public class InputDriverJoin extends Configured implements Tool
         int result;
         // TODO Add JSON Part
         JSONObject queryJSON = new JSONObject(args[0]);
-        Boolean hasJoin = true;
+        boolean hasJoin = !queryJSON.isNull("join");
         if(hasJoin) {
             result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
             if (0 == result) {

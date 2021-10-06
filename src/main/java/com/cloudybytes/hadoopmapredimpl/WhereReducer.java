@@ -22,7 +22,7 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 	}
 
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		ArrayList<Table> arr = new ArrayList<Table>();
+		ArrayList<Table> arr = new ArrayList<>();
 		String[] cNames = configuration.getStrings("cNames");
         String[] cTypes = configuration.getStrings("cTypes");
 		ArrayList<Pair<String, String>> keys = new ArrayList<>();
@@ -38,29 +38,29 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 				continue;
 			arr.add(row);
 		}
-		if (arr.size() == 0)
+		if (arr.isEmpty())
 			return;
 		// TODO Integrate with JSON
 		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
-		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
+		String aggregateFunction = queryJSON.getString("aggr_function");
 		JSONArray columnsJSONArray = queryJSON.getJSONArray("select_columns");
-		ArrayList<String> columnsArray = new ArrayList<String>();
+		ArrayList<String> columnsArray = new ArrayList<>();
 		for(i = 0; i < columnsJSONArray.length(); i++){
 			columnsArray.add(columnsJSONArray.getString(i));
 		}
-		// TODO add GroupBy Column
-		columnsArray.add(queryJSON.getString("group_by_column"));
-
+		
 		StringBuilder outputRow = new StringBuilder();
 
 		String aggr = String.valueOf(arr.get(0).getAggregate(aggregateFunction, havingJSON.getString(0), arr));
-		if (!arr.get(0).compareAggregate("age"/*havingJSON.get(0).toString()*/, "count"/*aggregateFunction*/, ">"/*havingJSON.get(1).toString()*/, "10"/*havingJSON.get(2).toString()*/, arr)) {
+		if (!arr.get(0).compareAggregate(havingJSON.getString(0), aggregateFunction, havingJSON.getString(1), havingJSON.getString(2), arr)) {
 			return;
 		}
 		for (i = 0; i < columnsArray.size(); i++) {
-			outputRow.append(",").append(arr.get(0).getColumnValue(columnsArray.get(i)).getKey());
+			if(arr.get(0).getColumnValue(columnsArray.get(i)) != null){
+				outputRow.append(arr.get(0).getColumnValue(columnsArray.get(i)).getKey()).append(", ");
+			}
 		}
-		outputRow.append(",").append(aggr);
-		context.write(key, new Text(outputRow.toString()));
+		outputRow.append(aggr);
+		context.write(new Text(""), new Text(outputRow.toString()));
 	}
 }

@@ -22,6 +22,7 @@ public class WhereDriver  extends Configured implements Tool
         // TODO Add JSON Part
         configuration.set("Name.File", queryJSON.getString("from_table"));
         configuration.set("Separator.Common", ",");
+        configuration.set("queryJSONString", args[0]);
         Job job = new Job(configuration, "Where Example");
         // TODO Add JSON Part
         boolean hasJoin = !queryJSON.isNull("join");
@@ -30,7 +31,7 @@ public class WhereDriver  extends Configured implements Tool
             FileInputFormat.addInputPath(job,new Path("Join/part-r-00000"));
         else{
 //           TODO add table from JSON
-            FileInputFormat.addInputPath(job,new Path(""));
+            FileInputFormat.addInputPath(job,new Path(configuration.get("Name.File")+".csv"));
         }
         job.setJarByClass(WhereDriver.class);
         job.setReducerClass(WhereReducer.class);

@@ -3,6 +3,7 @@ package com.cloudybytes.hadoopmapredimpl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
@@ -11,15 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.hadoop.util.ToolRunner;
 import org.json.JSONObject;
 import utils.tables.Table;
 
@@ -34,6 +26,8 @@ public class ServiceController {
 		args[0] = queryString;
 		boolean hasJoin = !queryJSON.isNull("join");
 
+		long start = new Date().getTime();
+		
 		if(hasJoin) {
 			result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
 			if (0 == result) {
@@ -46,8 +40,8 @@ public class ServiceController {
 				ArrayList<String> cNames = new ArrayList<>();
 				ArrayList<String> cTypes = new ArrayList<>();
 				// TODO Add JSON Part
-				int idx1 = Table.getIdx("rating", joinJSON.getString(2));
-				int idx2 = Table.getIdx("users", joinJSON.getString(4));
+				int idx1 = Table.getIdx(joinJSON.getString(1), joinJSON.getString(2));
+				int idx2 = Table.getIdx(joinJSON.getString(3), joinJSON.getString(4));
 				cNames.add(a.get(idx1).getKey());
 				cTypes.add(a.get(idx1).getKey());
 				int i = 0;
@@ -76,22 +70,20 @@ public class ServiceController {
 				}
 			}
 		}
-//		else {
-//			// TODO
-//		}
-//
-//		HashMap<Object, Tuple> outputMap = new HashMap<Object, Tuple>();
-//		try {
-//			TopologyUtils.startTime.set(System.currentTimeMillis());
-//			cluster.submitTopology("Topo", config, builder.createTopology());
-//			Thread.sleep(25000);
-//		} catch (Exception e) {
-//			System.out.println(e.getMessage());
-//		}
+		else {
+			Configuration conf = new Configuration();
+			result = ToolRunner.run(conf, new WhereDriver(), args);
+			if (0 != result)
+				System.out.println("Job Failed...");
+			else {
+				System.out.println("Job Completed Successfully");
+			}
+		}
+
+		long end = new Date().getTime();
+
 		Map<String, Object> response = new HashMap<String, Object>();
-//		response.put("time", TopologyUtils.endTime.get() - TopologyUtils.startTime.get() + " milliseconds");
-//		System.out.println("Size of map = " + outputMap.size());
-//		response.put("result", "/output" + TopologyUtils.outputFileNumber + ".csv");
+		response.put("Time", (end - start) + " milliseconds");
 		return response;
 	}
 }

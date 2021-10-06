@@ -50,7 +50,7 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
             row = new Table(values, keys);
         }
         // TODO Add given Where Conditions
-        Boolean hasWhere = !queryJSON.isNull("where");
+        boolean hasWhere = !queryJSON.isNull("where");
         if(hasWhere) {
             // TODO Add given Where Conditions
             JSONArray whereJSON = queryJSON.getJSONArray("where");
@@ -114,15 +114,14 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
         if(!hasGroupBy){
             // TODO Add given Select Conditions
             // TODO Integrate with JSON
-            JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
-            String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
-            //TODO check this
             JSONArray columnsArray = queryJSON.getJSONArray("select_columns");
             StringBuilder outputRow = new StringBuilder();
-            for (int i = 0; i < columnsArray.length(); i++) {
-                outputRow.append(",").append(row.getColumnValue(columnsArray.getString(i)).getKey());
+            outputRow.append(row.getColumnValue(columnsArray.getString(0)).getKey());
+            for (int i = 1; i < columnsArray.length(); i++) {
+                outputRow.append(", ").append(row.getColumnValue(columnsArray.getString(i)).getKey());
             }
-            context.write(new Text(key.toString()), new Text(outputRow.toString()));
+            System.out.println();
+            context.write(new Text(""), new Text(outputRow.toString()));
         }
         else {
             // TODO Implement JSON Integration
