@@ -15,10 +15,10 @@ public class InputMapper1Join extends Mapper<LongWritable, Text, Text, Text> {
         public void setup(Context context)
         {
             Configuration configuration = context.getConfiguration();
-//Retrieving the file separator from context for file1.
+            //Retrieving the file separator from context for file1.
             separator = configuration.get("Separator.File1");
             filename = configuration.get("Name.File1");
-//Retrieving the file separator from context for writing the data to reducer.
+            //Retrieving the file separator from context for writing the data to reducer.
             commonSeparator=configuration.get("Separator.Common");
             joinColumn = Integer.parseInt(configuration.get("JColumn1"));
         }

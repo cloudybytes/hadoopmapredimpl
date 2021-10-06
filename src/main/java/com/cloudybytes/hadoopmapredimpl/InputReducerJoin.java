@@ -65,4 +65,3 @@ public class InputReducerJoin extends Reducer<Text, Text, Text, Text>
             }
         }
     }
-

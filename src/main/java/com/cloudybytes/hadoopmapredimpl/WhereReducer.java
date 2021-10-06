@@ -18,7 +18,7 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 
 	public void setup(Context context){
 		configuration = context.getConfiguration();
-		// queryJSON = new JSONObject(configuration.get("queryJSONString"));
+		queryJSON = new JSONObject(configuration.get("queryJSONString"));
 	}
 
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -41,16 +41,19 @@ public class WhereReducer extends Reducer<Text, Text, Text, Text> {
 		if (arr.size() == 0)
 			return;
 		// TODO Integrate with JSON
-//		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
-//		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
-//		JSONArray columnsArray = queryJSON.getJSONArray("columns");
-		ArrayList<String> columnsArray = new ArrayList<>();
+		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
+		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
+		JSONArray columnsJSONArray = queryJSON.getJSONArray("select_columns");
+		ArrayList<String> columnsArray = new ArrayList<String>();
+		for(i = 0; i < columnsJSONArray.length(); i++){
+			columnsArray.add(columnsJSONArray.getString(i));
+		}
 		// TODO add GroupBy Column
-		columnsArray.add("age");
+		columnsArray.add(queryJSON.getString("group_by_column"));
 
 		StringBuilder outputRow = new StringBuilder();
 
-		String aggr = String.valueOf(arr.get(0).getAggregate("count"/*aggregateFunction*/, "age"/*havingJSON.get(0).toString()*/, arr));
+		String aggr = String.valueOf(arr.get(0).getAggregate(aggregateFunction, havingJSON.getString(0), arr));
 		if (!arr.get(0).compareAggregate("age"/*havingJSON.get(0).toString()*/, "count"/*aggregateFunction*/, ">"/*havingJSON.get(1).toString()*/, "10"/*havingJSON.get(2).toString()*/, arr)) {
 			return;
 		}

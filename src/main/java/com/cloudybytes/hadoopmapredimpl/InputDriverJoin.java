@@ -10,6 +10,8 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.tables.Table;
 
 import java.util.ArrayList;
@@ -19,18 +21,21 @@ public class InputDriverJoin extends Configured implements Tool
     @Override
     public int run(String[] args) throws Exception
     {
+        JSONObject queryJSON = new JSONObject(args[0]);
+        JSONArray joinJSON = queryJSON.getJSONArray("join");
         Configuration configuration = getConf();
         
         configuration.set("Separator.File1", ",");
         configuration.set("Separator.File2", ",");
         // TODO Add JSON Part
-        configuration.set("Name.File1", "rating");
-        configuration.set("Name.File2", "users");
-        configuration.set("Jointype","leftouter");
+        // TODO done
+        configuration.set("Name.File1", joinJSON.getString(1));
+        configuration.set("Name.File2", joinJSON.getString(3));
+        configuration.set("Jointype",joinJSON.getString(0));
         configuration.set("Separator.Common", ",");
 
-        Integer remidx1 = Table.getIdx(configuration.get("Name.File1"),"userid");
-        Integer remidx2 = Table.getIdx(configuration.get("Name.File2"),"userid");
+        Integer remidx1 = Table.getIdx(configuration.get("Name.File1"),joinJSON.getString(2));
+        Integer remidx2 = Table.getIdx(configuration.get("Name.File2"),joinJSON.getString(4));
         Integer size1 = Table.getKeys(configuration.get("Name.File1")).size();
         Integer size2 = Table.getKeys(configuration.get("Name.File2")).size();
         configuration.set("Size.File1",size1.toString());
@@ -39,8 +44,10 @@ public class InputDriverJoin extends Configured implements Tool
         configuration.set("JColumn2",remidx2.toString());
         Job job = new Job(configuration, "Multiple Input Example");
         // TODO Add JSON Part
-        MultipleInputs.addInputPath(job,new Path("rating.csv"), TextInputFormat.class, InputMapper1Join.class);
-        MultipleInputs.addInputPath(job, new Path("users.csv"), TextInputFormat.class, InputMapper2Join.class);
+        // TODO done
+
+        MultipleInputs.addInputPath(job,new Path(configuration.get("Name.File1") + ".csv"), TextInputFormat.class, InputMapper1Join.class);
+        MultipleInputs.addInputPath(job, new Path(configuration.get("Name.File2") + ".csv"), TextInputFormat.class, InputMapper2Join.class);
         job.setJarByClass(InputDriverJoin.class);
         job.setReducerClass(InputReducerJoin.class);
         job.setMapOutputKeyClass(Text.class);
@@ -55,8 +62,8 @@ public class InputDriverJoin extends Configured implements Tool
     public static void main(String [] args) throws Exception {
         int result;
         // TODO Add JSON Part
+        JSONObject queryJSON = new JSONObject(args[0]);
         Boolean hasJoin = true;
-        Boolean hasGroupBy = true;
         if(hasJoin) {
             result = ToolRunner.run(new Configuration(), new InputDriverJoin(), args);
             if (0 == result) {

@@ -5,6 +5,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.tables.Table;
 
@@ -24,17 +25,18 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
         Configuration configuration = context.getConfiguration();
         commonSeparator = configuration.get("Separator.Common");
         filename = configuration.get("Name.File");
+        queryJSON = new JSONObject(configuration.get("queryJSONString"));
     }
 
     public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         String[] values = value.toString().split(commonSeparator);
         StringBuilder stringBuilder = new StringBuilder();
         // TODO JSon Implement
-        // JSONArray whereJson = queryJSON.getJSONArray("where");
+        JSONArray whereJson = queryJSON.getJSONArray("where");
         Table row;
         // TODO Json Implement
-        Boolean hasJoin = true;
-        Boolean hasGroupBy = true;
+        boolean hasJoin = !queryJSON.isNull("join");
+        boolean hasGroupBy = !queryJSON.isNull("group_by_column");
         if (!hasJoin)
             row = new Table(values, Table.getKeys(filename));
         else {
@@ -48,12 +50,13 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
             row = new Table(values, keys);
         }
         // TODO Add given Where Conditions
-        Boolean hasWhere = true;
+        Boolean hasWhere = !queryJSON.isNull("where");
         if(hasWhere) {
             // TODO Add given Where Conditions
-            Pair<String, String> columnValue = row.getColumnValue("age");
-            String compareOperator = ">=";
-            String compareValue = "25";
+            JSONArray whereJSON = queryJSON.getJSONArray("where");
+            Pair<String, String> columnValue = row.getColumnValue(whereJSON.getString(0));
+            String compareOperator = whereJSON.getString(1);
+            String compareValue = whereJSON.getString(2);
             String type = columnValue.getValue();
 
             if (type.equalsIgnoreCase("Long")) {
@@ -110,20 +113,20 @@ public class WhereMapper extends Mapper<LongWritable, Text, Text, Text> {
         // TODO Add Primary Key if GroupBy doesn't exist
         if(!hasGroupBy){
             // TODO Add given Select Conditions
-                // TODO Integrate with JSON
-            //		JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
-            //		String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
-            //		JSONArray columnsArray = queryJSON.getJSONArray("columns");
-            ArrayList<String> columnsArray = new ArrayList<>();
+            // TODO Integrate with JSON
+            JSONArray havingJSON = queryJSON.getJSONArray("having_condition");
+            String aggregateFunction = queryJSON.getJSONObject("aggr_function").toString();
+            //TODO check this
+            JSONArray columnsArray = queryJSON.getJSONArray("select_columns");
             StringBuilder outputRow = new StringBuilder();
-            for (int i = 0; i < columnsArray.size(); i++) {
-                outputRow.append(",").append(row.getColumnValue(columnsArray.get(i)).getKey());
+            for (int i = 0; i < columnsArray.length(); i++) {
+                outputRow.append(",").append(row.getColumnValue(columnsArray.getString(i)).getKey());
             }
             context.write(new Text(key.toString()), new Text(outputRow.toString()));
         }
         else {
             // TODO Implement JSON Integration
-            Text groupByColumn = new Text(row.getColumnValue("age").getKey());
+            Text groupByColumn = new Text(row.getColumnValue(queryJSON.getString("group_by_column")).getKey());
             context.write(groupByColumn, value);
         }
     }
