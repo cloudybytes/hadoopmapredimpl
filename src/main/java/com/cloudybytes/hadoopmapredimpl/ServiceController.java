@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ToolRunner;
 import org.json.JSONArray;
@@ -100,7 +101,9 @@ public class ServiceController {
 			writer.close();
 		}
 		long end = new Date().getTime();
-
+		FileUtils.deleteDirectory(new File("whereOutput"));
+		if(hasJoin)
+			FileUtils.deleteDirectory(new File("Join"));
 		Map<String, Object> response = new HashMap<>();
 		response.put("time", (end - start) + " milliseconds");
 		response.put("output_url","/output.csv");
